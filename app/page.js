@@ -1,103 +1,222 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const { user, loading, signIn, signUp } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false); // false = sign in, true = sign up
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/appointments");
+    }
+  }, [loading, user, router]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      if (isSignUp) {
+        // Handle sign-up
+        if (!name) {
+          throw new Error("נא להזין שם מלא");
+        }
+
+        if (!email) {
+          throw new Error("נא להזין כתובת אימייל");
+        }
+
+        if (!phoneNumber) {
+          throw new Error("נא להזין מספר טלפון");
+        }
+
+        if (!password || password.length < 6) {
+          throw new Error("סיסמה חייבת להכיל לפחות 6 תווים");
+        }
+
+        if (password !== confirmPassword) {
+          throw new Error("הסיסמאות אינן תואמות");
+        }
+
+        // Validate Israeli phone number
+        if (!phoneNumber.startsWith("+972") || phoneNumber.length !== 13) {
+          throw new Error("אנא הכניסי מספר טלפון ישראלי תקין");
+        }
+
+        await signUp(email, password, name, phoneNumber);
+      } else {
+        // Handle sign-in
+        if (!email) {
+          throw new Error("נא להזין כתובת אימייל");
+        }
+
+        if (!password) {
+          throw new Error("נא להזין סיסמה");
+        }
+
+        await signIn(email, password);
+      }
+
+      // Redirect to appointments page on success
+      router.push("/appointments");
+    } catch (error) {
+      console.error("Authentication error:", error);
+      setError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setError("");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="text-xl font-semibold text-pink-600">טוען...</div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return null; // Will redirect via useEffect
+  }
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-pink-50">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-pink-600 mb-2">נטע ניילס</h1>
+          <p className="text-gray-600">מערכת קביעת תורים ללק ג'ל</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                שם מלא
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                placeholder="הכניסי את שמך המלא"
+                dir="rtl"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              כתובת אימייל
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder="example@email.com"
+              dir="ltr"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              סיסמה
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              placeholder={isSignUp ? "לפחות 6 תווים" : "הכניסי את הסיסמה שלך"}
+              dir="ltr"
+            />
+          </div>
+
+          {isSignUp && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  אימות סיסמה
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  placeholder="הכניסי את הסיסמה שוב"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  מספר טלפון
+                </label>
+                <PhoneInput
+                  international
+                  defaultCountry="IL"
+                  value={phoneNumber}
+                  onChange={setPhoneNumber}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  placeholder="הכניסי את מספר הטלפון שלך"
+                  dir="ltr"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  * יש להזין מספר טלפון ישראלי עם קידומת 972+
+                </p>
+              </div>
+            </>
+          )}
+
+          {error && <div className="text-red-500 text-sm py-2">{error}</div>}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting
+              ? isSignUp
+                ? "רושם..."
+                : "מתחבר..."
+              : isSignUp
+              ? "הרשמה"
+              : "התחברות"}
+          </button>
+
+          <div className="text-center mt-4">
+            <button
+              type="button"
+              onClick={toggleAuthMode}
+              className="text-pink-600 hover:underline focus:outline-none"
+            >
+              {isSignUp
+                ? "כבר יש לך חשבון? התחברי כאן"
+                : "אין לך חשבון? הרשמי כאן"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }
