@@ -23,7 +23,6 @@ export default function AdminPage() {
   // New appointment form state
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState("");
-  const [duration, setDuration] = useState(90); // Default duration is 90 minutes
 
   // Filter states
   const [showAll, setShowAll] = useState(true);
@@ -80,7 +79,6 @@ export default function AdminPage() {
       await createAppointment({
         date: formattedDate,
         time,
-        duration: Number(duration),
       });
 
       setSuccess("התור נוצר בהצלחה");
@@ -89,7 +87,6 @@ export default function AdminPage() {
       // Reset form
       setDate(new Date());
       setTime("");
-      setDuration(90);
 
       // Refresh appointments
       fetchAppointments();
@@ -259,21 +256,6 @@ export default function AdminPage() {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  משך (בדקות)
-                </label>
-                <input
-                  type="number"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  min={30}
-                  step={15}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                />
-              </div>
-
               <button
                 type="submit"
                 className="w-full py-2 px-4 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors"
@@ -293,7 +275,6 @@ export default function AdminPage() {
                 <tr>
                   <th className="px-4 py-2 text-right">תאריך</th>
                   <th className="px-4 py-2 text-right">שעה</th>
-                  <th className="px-4 py-2 text-right">משך</th>
                   <th className="px-4 py-2 text-right">סטטוס</th>
                   <th className="px-4 py-2 text-right">נקבע ע&quot;י</th>
                   <th className="px-4 py-2 text-right">פעולות</th>
@@ -328,9 +309,6 @@ export default function AdminPage() {
                         {formatDate(appointment.date)}
                       </td>
                       <td className="px-4 py-3">{appointment.time}</td>
-                      <td className="px-4 py-3">
-                        {appointment.duration || 90} דקות
-                      </td>
                       <td className="px-4 py-3">
                         {appointment.status === "available" ? (
                           <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
@@ -406,9 +384,6 @@ export default function AdminPage() {
                     <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div className="text-gray-600">שעה:</div>
                       <div>{appointment.time}</div>
-
-                      <div className="text-gray-600">משך:</div>
-                      <div>{appointment.duration || 90} דקות</div>
 
                       {appointment.status === "booked" &&
                         appointment.bookedBy && (

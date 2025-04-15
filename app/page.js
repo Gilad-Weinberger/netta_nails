@@ -32,7 +32,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-pink-50">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-pink-600 mb-3">נטע ניילס</h1>
+          <h1 className="text-4xl font-bold text-pink-600 mb-3">Netta Nails</h1>
           <p className="text-gray-600">מערכת קביעת תורים ללק ג&apos;ל</p>
         </div>
 

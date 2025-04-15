@@ -383,9 +383,6 @@ export default function Appointments() {
                       <div className="text-gray-600">
                         שעה: {appointment.time}
                       </div>
-                      <div className="text-gray-500 text-sm">
-                        משך: {appointment.duration || 90} דקות
-                      </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <div className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-xs">
@@ -446,9 +443,6 @@ export default function Appointments() {
                       {formatDate(appointment.date)}
                     </div>
                     <div className="text-gray-600">שעה: {appointment.time}</div>
-                    <div className="text-gray-500 text-sm">
-                      משך: {appointment.duration || 90} דקות
-                    </div>
                   </div>
                   <button
                     onClick={() => handleBookAppointment(appointment.id)}
