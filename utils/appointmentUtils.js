@@ -18,26 +18,40 @@ import {
  * @returns {Promise<Array>} - Array of available appointments
  */
 export async function getAvailableAppointments() {
-  const appointmentsRef = collection(db, "appointments");
-  const q = query(
-    appointmentsRef,
-    where("status", "==", "available"),
-    where("date", ">=", new Date().toISOString().split("T")[0]), // Only future dates
-    orderBy("date"),
-    orderBy("time")
-  );
+  try {
+    const appointmentsRef = collection(db, "appointments");
+    // Using a simpler query that doesn't require a composite index
+    // We'll filter and sort the results in memory after fetching
+    const q = query(appointmentsRef, where("status", "==", "available"));
 
-  const querySnapshot = await getDocs(q);
-  const appointments = [];
+    const querySnapshot = await getDocs(q);
+    const appointments = [];
+    const today = new Date().toISOString().split("T")[0];
 
-  querySnapshot.forEach((doc) => {
-    appointments.push({
-      id: doc.id,
-      ...doc.data(),
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Only include appointments with dates in the future
+      if (data.date >= today) {
+        appointments.push({
+          id: doc.id,
+          ...data,
+        });
+      }
     });
-  });
 
-  return appointments;
+    // Sort the results manually
+    return appointments.sort((a, b) => {
+      // First sort by date
+      if (a.date !== b.date) {
+        return a.date.localeCompare(b.date);
+      }
+      // If dates are the same, sort by time
+      return a.time.localeCompare(b.time);
+    });
+  } catch (error) {
+    console.error("Error fetching available appointments:", error);
+    throw error;
+  }
 }
 
 /**
@@ -45,25 +59,39 @@ export async function getAvailableAppointments() {
  * @returns {Promise<Array>} - Array of all appointments
  */
 export async function getAllAppointments() {
-  const appointmentsRef = collection(db, "appointments");
-  const q = query(
-    appointmentsRef,
-    where("date", ">=", new Date().toISOString().split("T")[0]), // Only future dates
-    orderBy("date"),
-    orderBy("time")
-  );
+  try {
+    const appointmentsRef = collection(db, "appointments");
+    // Using a simpler query that doesn't require a composite index
+    const q = query(appointmentsRef);
 
-  const querySnapshot = await getDocs(q);
-  const appointments = [];
+    const querySnapshot = await getDocs(q);
+    const appointments = [];
+    const today = new Date().toISOString().split("T")[0];
 
-  querySnapshot.forEach((doc) => {
-    appointments.push({
-      id: doc.id,
-      ...doc.data(),
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Only include appointments with dates in the future
+      if (data.date >= today) {
+        appointments.push({
+          id: doc.id,
+          ...data,
+        });
+      }
     });
-  });
 
-  return appointments;
+    // Sort the results manually
+    return appointments.sort((a, b) => {
+      // First sort by date
+      if (a.date !== b.date) {
+        return a.date.localeCompare(b.date);
+      }
+      // If dates are the same, sort by time
+      return a.time.localeCompare(b.time);
+    });
+  } catch (error) {
+    console.error("Error fetching all appointments:", error);
+    throw error;
+  }
 }
 
 /**
@@ -72,26 +100,39 @@ export async function getAllAppointments() {
  * @returns {Promise<Array>} - Array of user's appointments
  */
 export async function getUserAppointments(uid) {
-  const appointmentsRef = collection(db, "appointments");
-  const q = query(
-    appointmentsRef,
-    where("bookedBy.uid", "==", uid),
-    where("date", ">=", new Date().toISOString().split("T")[0]), // Only future dates
-    orderBy("date"),
-    orderBy("time")
-  );
+  try {
+    const appointmentsRef = collection(db, "appointments");
+    // Using a simpler query that only requires a basic index
+    const q = query(appointmentsRef, where("bookedBy.uid", "==", uid));
 
-  const querySnapshot = await getDocs(q);
-  const appointments = [];
+    const querySnapshot = await getDocs(q);
+    const appointments = [];
+    const today = new Date().toISOString().split("T")[0];
 
-  querySnapshot.forEach((doc) => {
-    appointments.push({
-      id: doc.id,
-      ...doc.data(),
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      // Only include appointments with dates in the future
+      if (data.date >= today) {
+        appointments.push({
+          id: doc.id,
+          ...data,
+        });
+      }
     });
-  });
 
-  return appointments;
+    // Sort the results manually
+    return appointments.sort((a, b) => {
+      // First sort by date
+      if (a.date !== b.date) {
+        return a.date.localeCompare(b.date);
+      }
+      // If dates are the same, sort by time
+      return a.time.localeCompare(b.time);
+    });
+  } catch (error) {
+    console.error("Error fetching user appointments:", error);
+    throw error;
+  }
 }
 
 /**
