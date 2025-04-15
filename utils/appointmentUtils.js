@@ -164,7 +164,7 @@ export async function bookAppointment(appointmentId, user) {
   const diffHours = (appointmentDateTime - now) / (1000 * 60 * 60);
 
   if (diffHours < 24) {
-    throw new Error("Appointments must be booked at least 24 hours in advance");
+    throw new Error("יש להזמין תור לפחות 24 שעות מראש");
   }
 
   // Update appointment status to booked
@@ -176,6 +176,54 @@ export async function bookAppointment(appointmentId, user) {
       phone: user.phone,
     },
     bookedAt: new Date().toISOString(),
+  });
+
+  // Get updated appointment
+  const updatedAppointment = await getDoc(appointmentRef);
+
+  return {
+    id: updatedAppointment.id,
+    ...updatedAppointment.data(),
+  };
+}
+
+/**
+ * Cancel a booked appointment
+ * @param {string} appointmentId - Appointment ID
+ * @returns {Promise<Object>} - Updated appointment
+ */
+export async function cancelAppointment(appointmentId) {
+  const appointmentRef = doc(db, "appointments", appointmentId);
+  const appointmentDoc = await getDoc(appointmentRef);
+
+  if (!appointmentDoc.exists()) {
+    throw new Error("Appointment not found");
+  }
+
+  const appointmentData = appointmentDoc.data();
+
+  // Check if appointment is booked
+  if (appointmentData.status !== "booked") {
+    throw new Error("This appointment is not currently booked");
+  }
+
+  // Check if appointment is at least 24 hours in the future
+  const appointmentDateTime = new Date(
+    `${appointmentData.date}T${appointmentData.time}`
+  );
+  const now = new Date();
+  const diffHours = (appointmentDateTime - now) / (1000 * 60 * 60);
+
+  if (diffHours < 24) {
+    throw new Error("לא ניתן לבטל תור פחות מ-24 שעות לפני מועד התור");
+  }
+
+  // Update appointment status back to available
+  await updateDoc(appointmentRef, {
+    status: "available",
+    bookedBy: null,
+    bookedAt: null,
+    canceledAt: new Date().toISOString(),
   });
 
   // Get updated appointment

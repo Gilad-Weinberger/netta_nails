@@ -157,13 +157,15 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-pink-50 py-8 px-4">
+    <main className="min-h-screen bg-pink-50 py-4 px-4 md:py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-pink-600">ניהול תורים</h1>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+          <h1 className="text-2xl font-bold text-pink-600 mb-4 sm:mb-0">
+            ניהול תורים
+          </h1>
           <button
             onClick={handleSignOut}
-            className="text-sm text-pink-600 hover:text-pink-800"
+            className="text-sm text-pink-600 hover:text-pink-800 bg-white py-2 px-4 rounded-md shadow-sm self-start sm:self-auto"
           >
             התנתקי
           </button>
@@ -187,15 +189,15 @@ export default function AdminPage() {
           </div>
         )}
 
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors"
+            className="px-4 py-2 bg-pink-600 text-white font-semibold rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors w-full sm:w-auto"
           >
             {showForm ? "ביטול" : "הוספת תור חדש"}
           </button>
 
-          <div className="flex space-x-2">
+          <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShowAll(true)}
               className={`px-4 py-2 rounded-md transition-colors ${
@@ -214,13 +216,13 @@ export default function AdminPage() {
                   : "bg-white text-pink-600 border border-pink-600"
               }`}
             >
-              תורים זמינים בלבד
+              זמינים בלבד
             </button>
           </div>
         </div>
 
         {showForm && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
               הוספת תור חדש
             </h2>
@@ -243,23 +245,16 @@ export default function AdminPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   שעה
                 </label>
-                <select
+                <input
+                  type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  min="08:00"
+                  max="20:00"
                   required
-                >
-                  <option value="">בחרי שעה</option>
-                  <option value="09:00">09:00</option>
-                  <option value="10:30">10:30</option>
-                  <option value="12:00">12:00</option>
-                  <option value="13:30">13:30</option>
-                  <option value="15:00">15:00</option>
-                  <option value="16:30">16:30</option>
-                  <option value="18:00">18:00</option>
-                </select>
+                />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   משך (בדקות)
@@ -285,51 +280,114 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* Responsive table for appointments */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-pink-100">
-              <tr>
-                <th className="px-4 py-2 text-right">תאריך</th>
-                <th className="px-4 py-2 text-right">שעה</th>
-                <th className="px-4 py-2 text-right">משך</th>
-                <th className="px-4 py-2 text-right">סטטוס</th>
-                <th className="px-4 py-2 text-right">נקבע ע"י</th>
-                <th className="px-4 py-2 text-right">פעולות</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
+          {/* Desktop table view - hidden on mobile */}
+          <div className="hidden md:block">
+            <table className="w-full">
+              <thead className="bg-pink-100">
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-pink-600"
-                  >
-                    טוען תורים...
-                  </td>
+                  <th className="px-4 py-2 text-right">תאריך</th>
+                  <th className="px-4 py-2 text-right">שעה</th>
+                  <th className="px-4 py-2 text-right">משך</th>
+                  <th className="px-4 py-2 text-right">סטטוס</th>
+                  <th className="px-4 py-2 text-right">נקבע ע"י</th>
+                  <th className="px-4 py-2 text-right">פעולות</th>
                 </tr>
-              ) : filteredAppointments.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-gray-500"
-                  >
-                    אין תורים להצגה
-                  </td>
-                </tr>
-              ) : (
-                filteredAppointments.map((appointment) => (
-                  <tr
-                    key={appointment.id}
-                    className="border-b border-gray-200 hover:bg-pink-50"
-                  >
-                    <td className="px-4 py-3">
-                      {formatDate(appointment.date)}
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-pink-600"
+                    >
+                      טוען תורים...
                     </td>
-                    <td className="px-4 py-3">{appointment.time}</td>
-                    <td className="px-4 py-3">
-                      {appointment.duration || 90} דקות
+                  </tr>
+                ) : filteredAppointments.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-gray-500"
+                    >
+                      אין תורים להצגה
                     </td>
-                    <td className="px-4 py-3">
+                  </tr>
+                ) : (
+                  filteredAppointments.map((appointment) => (
+                    <tr
+                      key={appointment.id}
+                      className="border-b border-gray-200 hover:bg-pink-50"
+                    >
+                      <td className="px-4 py-3">
+                        {formatDate(appointment.date)}
+                      </td>
+                      <td className="px-4 py-3">{appointment.time}</td>
+                      <td className="px-4 py-3">
+                        {appointment.duration || 90} דקות
+                      </td>
+                      <td className="px-4 py-3">
+                        {appointment.status === "available" ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                            זמין
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            תפוס
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {appointment.status === "booked" &&
+                        appointment.bookedBy ? (
+                          <div>
+                            <div className="font-semibold">
+                              {appointment.bookedBy.name}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {appointment.bookedBy.phone}
+                            </div>
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() =>
+                            handleDeleteAppointment(appointment.id)
+                          }
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          מחיקה
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card view - shown only on mobile */}
+          <div className="md:hidden">
+            {isLoading ? (
+              <div className="px-4 py-8 text-center text-pink-600">
+                טוען תורים...
+              </div>
+            ) : filteredAppointments.length === 0 ? (
+              <div className="px-4 py-8 text-center text-gray-500">
+                אין תורים להצגה
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200">
+                {filteredAppointments.map((appointment) => (
+                  <div key={appointment.id} className="p-4 hover:bg-pink-50">
+                    <div className="flex justify-between mb-2">
+                      <div className="font-semibold">
+                        {formatDate(appointment.date)}
+                      </div>
                       {appointment.status === "available" ? (
                         <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
                           זמין
@@ -339,35 +397,44 @@ export default function AdminPage() {
                           תפוס
                         </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                      <div className="text-gray-600">שעה:</div>
+                      <div>{appointment.time}</div>
+
+                      <div className="text-gray-600">משך:</div>
+                      <div>{appointment.duration || 90} דקות</div>
+
                       {appointment.status === "booked" &&
-                      appointment.bookedBy ? (
-                        <div>
-                          <div className="font-semibold">
-                            {appointment.bookedBy.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {appointment.bookedBy.phone}
-                          </div>
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
+                        appointment.bookedBy && (
+                          <>
+                            <div className="text-gray-600">נקבע ע"י:</div>
+                            <div>
+                              <div className="font-semibold">
+                                {appointment.bookedBy.name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {appointment.bookedBy.phone}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end">
                       <button
                         onClick={() => handleDeleteAppointment(appointment.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md text-sm"
                       >
                         מחיקה
                       </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>

@@ -66,7 +66,7 @@ export function AuthProvider({ children }) {
           email: email,
           phone: phone,
           name: name,
-          role: "user", // Default role is user
+          role: "client", // Default role is user
           createdAt: new Date().toISOString(),
         },
         { merge: true }
