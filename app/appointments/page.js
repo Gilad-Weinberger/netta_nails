@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -20,6 +20,21 @@ export default function Appointments() {
     useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const fetchUserAppointments = useCallback(async () => {
+    if (!user) return;
+
+    setIsLoadingUserAppointments(true);
+    try {
+      const userAppointmentsData = await getUserAppointments(user.uid);
+      setUserAppointments(userAppointmentsData);
+    } catch (error) {
+      console.error("Error fetching user appointments:", error);
+      // Don't set global error for this to avoid confusing the user
+    } finally {
+      setIsLoadingUserAppointments(false);
+    }
+  }, [user]);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -41,7 +56,7 @@ export default function Appointments() {
       fetchAppointments();
       fetchUserAppointments();
     }
-  }, [user, isAdmin]);
+  }, [user, isAdmin, fetchUserAppointments]);
 
   const fetchAppointments = async () => {
     setIsLoading(true);
@@ -54,19 +69,6 @@ export default function Appointments() {
       setError("שגיאה בטעינת התורים הזמינים");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchUserAppointments = async () => {
-    setIsLoadingUserAppointments(true);
-    try {
-      const userAppointmentsData = await getUserAppointments(user.uid);
-      setUserAppointments(userAppointmentsData);
-    } catch (error) {
-      console.error("Error fetching user appointments:", error);
-      // Don't set global error for this to avoid confusing the user
-    } finally {
-      setIsLoadingUserAppointments(false);
     }
   };
 

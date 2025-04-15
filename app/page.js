@@ -33,7 +33,7 @@ export default function Home() {
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-pink-600 mb-3">נטע ניילס</h1>
-          <p className="text-gray-600">מערכת קביעת תורים ללק ג'ל</p>
+          <p className="text-gray-600">מערכת קביעת תורים ללק ג&apos;ל</p>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -50,7 +50,7 @@ export default function Home() {
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>קביעת תור לאיחור ג'ל | מניקור | פדיקור</p>
+          <p>קביעת תור לאיחור ג&apos;ל | מניקור | פדיקור</p>
           <p className="mt-2">© נטע ניילס 2025</p>
         </div>
       </div>

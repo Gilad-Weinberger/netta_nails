@@ -7,7 +7,7 @@ const ULTRAMSG_API_TOKEN = process.env.ULTRAMSG_API_TOKEN; // Hardcoded for test
 const ULTRAMSG_BASE_URL = `https://api.ultramsg.com/${ULTRAMSG_INSTANCE_ID}`;
 
 // Admin phone number
-const ADMIN_PHONE = process.env.NEXT_PUBLIC_ADMIN_PHONE; // Replace with your actual admin phone number
+const ADMIN_PHONE = process.env.ADMIN_PHONE; // Replace with your actual admin phone number
 
 /**
  * Server-side function to send WhatsApp notification

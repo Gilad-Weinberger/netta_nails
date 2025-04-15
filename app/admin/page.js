@@ -100,7 +100,11 @@ export default function AdminPage() {
   };
 
   const handleDeleteAppointment = async (appointmentId) => {
-    if (!window.confirm("האם את בטוחה שברצונך למחוק תור זה?")) {
+    if (
+      !window.confirm(
+        "האם את בטוחה שברצונך למחוק תור זה?".replace(/"/g, "&quot;")
+      )
+    ) {
       return;
     }
 
@@ -291,7 +295,7 @@ export default function AdminPage() {
                   <th className="px-4 py-2 text-right">שעה</th>
                   <th className="px-4 py-2 text-right">משך</th>
                   <th className="px-4 py-2 text-right">סטטוס</th>
-                  <th className="px-4 py-2 text-right">נקבע ע"י</th>
+                  <th className="px-4 py-2 text-right">נקבע ע&quot;י</th>
                   <th className="px-4 py-2 text-right">פעולות</th>
                 </tr>
               </thead>
@@ -409,7 +413,7 @@ export default function AdminPage() {
                       {appointment.status === "booked" &&
                         appointment.bookedBy && (
                           <>
-                            <div className="text-gray-600">נקבע ע"י:</div>
+                            <div className="text-gray-600">נקבע ע&quot;י:</div>
                             <div>
                               <div className="font-semibold">
                                 {appointment.bookedBy.name}
